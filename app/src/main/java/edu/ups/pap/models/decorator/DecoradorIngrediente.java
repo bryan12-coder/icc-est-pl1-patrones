@@ -1,5 +1,10 @@
 package edu.ups.pap.models.decorator;
 
-public class DecoradorIngrediente {
+import edu.ups.pap.models.Pedido;
+
+public abstract class DecoradorIngrediente {
+    
+
+    
     
 }

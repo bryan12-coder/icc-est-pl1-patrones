@@ -1,5 +1,10 @@
 package edu.ups.pap.models.prototype;
 
-public class Prototipo {
+public interface Prototipo<T> {
+
+    T copiar(String nuevoId);
+
+
+
     
 }

@@ -1,5 +1,7 @@
 package edu.ups.pap.models;
 
-public class TipoProducto {
+public enum TipoProducto {
+    Cafe,Pizza,Ensalada
+
     
 }

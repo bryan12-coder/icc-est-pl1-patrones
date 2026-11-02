@@ -1,5 +1,19 @@
 package edu.ups.pap.models;
 
-public class Pedido {
+import java.math.BigDecimal;
+
+public interface Pedido {
+    
+    String descripcion();
+    
+    BigDecimal precio();
+
+    String id();
+
+    TipoProducto tipo();
+    
+
+
+    
     
 }
