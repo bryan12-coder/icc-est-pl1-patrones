@@ -3,12 +3,36 @@
  */
 package edu.ups.pap;
 
+import edu.ups.pap.models.prototype.Cafe;
+import edu.ups.pap.models.prototype.Ensalada;
+import edu.ups.pap.models.prototype.Pizza;
+import edu.ups.pap.models.prototype.RegistroPrototipos;
+import edu.ups.pap.models.servicio.ServicioPedidos;
+import edu.ups.pap.vista.VentanaPedidos;
+
 public class App {
     public String getGreeting() {
         return "Hello World!";
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+       RegistroPrototipos registro = new RegistroPrototipos();
+
+        // 2. Registrar los productos originales
+        registro.registrar("cafe",
+            new Cafe("BASE-CAFE"));
+
+        registro.registrar("ensalada",
+            new Ensalada("BASE-ENSALADA"));
+
+        registro.registrar("pizza",
+            new Pizza("BASE-PIZZA"));
+
+        // 3. Crear el servicio
+        ServicioPedidos servicio = new ServicioPedidos(registro);
+
+        // 4. Crear y mostrar la ventana
+        VentanaPedidos ventana = new VentanaPedidos(servicio);
+        ventana.setVisible(true);
     }
 }

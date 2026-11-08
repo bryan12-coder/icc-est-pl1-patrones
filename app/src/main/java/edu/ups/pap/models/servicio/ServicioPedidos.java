@@ -22,31 +22,52 @@ public class ServicioPedidos {
 
     return registro.crearCopia(clave, nuevoId);
     }
-    public Pedido agregarQueso(Pedido pedido) {
+    //Vamos a verificar que exista el pedido
+    private void validarPedido(Pedido pedido){
+        if(pedido == null){
+            throw new IllegalArgumentException("El pedido no puede llegar a ser nulo");
 
-    return new Queso(pedido);
+        }
+    }
+    // Verificamos que el ingrediente corresppnda la producto
+    private void validarTipo(Pedido pedido, String tipoEsperado){
+        validarPedido(pedido);
+
+        if(!pedido.tipo().name().equalsIgnoreCase(tipoEsperado)){
+            throw new IllegalArgumentException("Ingrediente incompatible con " + pedido.tipo());
+        }
+
+    }
+    public Pedido agregarQueso(Pedido pedido) {
+        validarTipo(pedido, "PIZZA");
+        return new Queso(pedido);
     }
 
     public Pedido agregarPepperoni(Pedido pedido) {
-
-    return new Pepperoni(pedido);
-
+        validarTipo(pedido, "PIZZA");
+        return new Pepperoni(pedido);
     }
+
+    // Ingredientes para Ensalada
     public Pedido agregarTomate(Pedido pedido) {
-    return new Tomate(pedido);
+        validarTipo(pedido, "ENSALADA");
+        return new Tomate(pedido);
     }
 
     public Pedido agregarPollo(Pedido pedido) {
-    return new Pollo(pedido);
+        validarTipo(pedido, "ENSALADA");
+        return new Pollo(pedido);
     }
 
-     public Pedido agregarCrema(Pedido pedido) {
-    return new Crema(pedido);
+    // Ingredientes para Cafe
+    public Pedido agregarCrema(Pedido pedido) {
+        validarTipo(pedido, "CAFE");
+        return new Crema(pedido);
     }
 
     public Pedido agregarAzucar(Pedido pedido) {
-        
-    return new Azucar(pedido);
+        validarTipo(pedido, "CAFE");
+        return new Azucar(pedido);
     }
 
     

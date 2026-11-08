@@ -3,7 +3,7 @@ package edu.ups.pap.models.decorator;
 import java.math.BigDecimal;
 
 import edu.ups.pap.models.Pedido;
-import edu.ups.pap.models.prototype.Cafe;
+
 
 public class Crema extends DecoradorIngrediente{
 
@@ -17,9 +17,9 @@ public class Crema extends DecoradorIngrediente{
     }
     @Override 
     public BigDecimal precio(){
-        return super.precio().add(new BigDecimal("0.50"));
+        return super.precio().add(new BigDecimal("1.20"));
     }
-    
+
 
     
 }

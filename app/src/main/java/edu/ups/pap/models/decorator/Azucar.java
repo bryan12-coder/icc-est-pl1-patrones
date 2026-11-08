@@ -16,7 +16,7 @@ public class Azucar extends DecoradorIngrediente {
     }
     @Override 
     public BigDecimal precio(){
-        return super.precio().add(new BigDecimal("0.25"));
+        return super.precio().add(new BigDecimal("0.50"));
     }
     
 }

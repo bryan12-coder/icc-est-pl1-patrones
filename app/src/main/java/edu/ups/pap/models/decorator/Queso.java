@@ -16,7 +16,7 @@ public class Queso extends DecoradorIngrediente {
     }
     @Override 
     public BigDecimal precio(){
-        return super.precio().add(new BigDecimal("0.75"));
+        return super.precio().add(new BigDecimal("1.00"));
     }
     
 }

@@ -2,7 +2,7 @@ package edu.ups.pap;
 
 import java.math.BigDecimal;
 
-import edu.ups.pap.controllers.ControladorPedidos;
+
 import edu.ups.pap.models.Pedido;
 import edu.ups.pap.models.prototype.ProductoBase;
 import edu.ups.pap.models.prototype.RegistroPrototipos;
@@ -10,95 +10,61 @@ import edu.ups.pap.models.servicio.ServicioPedidos;
 
 public class pruebasAceptacion {
 
-    private static int aprobados = 0;
-    private static int fallidos = 0;
-
-    public static void verificar(String caso, boolean condicion) {
-        if (condicion) {
-            System.out.println(caso + ": APROBADO");
-            aprobados++;
-        } else {
-            System.out.println(caso + ": FALLIDO");
-            fallidos++;
-        }
-    }
-
-    public static boolean precioEs(Pedido pedido, String precio) {
-        return pedido != null && pedido.precio().compareTo(new BigDecimal(precio)) == 0;
-    }
-
-    public static boolean contiene(Pedido pedido, String ingrediente) {
-        return pedido != null
-                && pedido.descripcion().toLowerCase()
-                    .contains(ingrediente.toLowerCase());
-    }
-
     public static void main(String[] args) {
 
         RegistroPrototipos registro = new RegistroPrototipos();
         ServicioPedidos servicio = new ServicioPedidos(registro);
-        ControladorPedidos controlador =
-                new ControladorPedidos(servicio);
 
-        // CA01: Clonar Cafe dos veces
-        System.out.println("\nCA01");
+        // CA01: Clonar dos cafes
+        System.out.println("\n===== CA01 =====");
 
-        ProductoBase cafe1 = registro.crearCopia("cafe", "C001");
-        ProductoBase cafe2 = registro.crearCopia("cafe", "C002");
+        Pedido cafe1 = servicio.crearPedido("cafe", "C001");
+        Pedido cafe2 = servicio.crearPedido("cafe", "C002");
 
-        if (cafe1 != null && cafe2 != null) {
-            System.out.println("Cafe 1: " + cafe1.id()
-                    + " - $" + cafe1.precio());
-            System.out.println("Cafe 2: " + cafe2.id()
-                    + " - $" + cafe2.precio());
+        if (cafe1 != null && cafe2 != null
+                && !cafe1.id().equals(cafe2.id())
+                && cafe1.precio().compareTo(new BigDecimal("2.20")) == 0
+                && cafe2.precio().compareTo(new BigDecimal("2.20")) == 0) {
+            System.out.println("APROBADO");
+        } else {
+            System.out.println("FALLIDO");
         }
 
-        verificar("CA01",
-                cafe1 != null
-                && cafe2 != null
-                && !cafe1.id().equals(cafe2.id())
-                && precioEs(cafe1, "2.20")
-                && precioEs(cafe2, "2.20"));
-
-        // CA02: Comparar clon y prototipo
+        // CA02: Verificar que el clon sea independiente
         System.out.println("\n===== CA02 =====");
 
         ProductoBase original = registro.obtener("cafe");
 
-        if (original != null) {
-            System.out.println("Original: " + original.id()
-                    + " - $" + original.precio());
+        if (cafe1 != null && original != null
+                && cafe1 != original
+                && original.precio().compareTo(new BigDecimal("2.20")) == 0) {
+            System.out.println("APROBADO");
+        } else {
+            System.out.println("FALLIDO");
         }
 
-        System.out.println("Referencias distintas: "
-                + (cafe1 != original));
-
-        verificar("CA02",
-                cafe1 != null
-                && original != null
-                && cafe1 != original
-                && precioEs(original, "2.20"));
-
-        // CA03: Cafe con Azucar y Crema
+        // CA03: Cafe con azucar y crema
         System.out.println("\n===== CA03 =====");
 
         if (cafe1 != null) {
-            Pedido cafeDecorado = servicio.agregarAzucar(cafe1);
-            cafeDecorado = servicio.agregarCrema(cafeDecorado);
+            cafe1 = servicio.agregarAzucar(cafe1);
+            cafe1 = servicio.agregarCrema(cafe1);
 
-            System.out.println(cafeDecorado.descripcion());
-            System.out.println("Total: $" + cafeDecorado.precio());
+            System.out.println(cafe1.descripcion());
+            System.out.println("Total: $" + cafe1.precio());
 
-            verificar("CA03",
-                    (contiene(cafeDecorado, "azucar")
-                    || contiene(cafeDecorado, "azúcar"))
-                    && contiene(cafeDecorado, "crema")
-                    && precioEs(cafeDecorado, "3.90"));
+            if (cafe1.precio().compareTo(new BigDecimal("3.90")) == 0
+                    && cafe1.descripcion().contains("Azucar")
+                    && cafe1.descripcion().contains("Crema")) {
+                System.out.println("APROBADO");
+            } else {
+                System.out.println("FALLIDO");
+            }
         } else {
-            verificar("CA03", false);
+            System.out.println("FALLIDO");
         }
 
-        // CA04: Segundo Cafe sin ingredientes
+        // CA04: El segundo cafe no debe cambiar
         System.out.println("\n===== CA04 =====");
 
         if (cafe2 != null) {
@@ -106,16 +72,19 @@ public class pruebasAceptacion {
             System.out.println("Total: $" + cafe2.precio());
         }
 
-        verificar("CA04",
-                precioEs(cafe2, "2.20")
-                && !contiene(cafe2, "azucar")
-                && !contiene(cafe2, "azúcar")
-                && !contiene(cafe2, "crema"));
+        if (cafe2 != null
+                && cafe2.precio().compareTo(new BigDecimal("2.20")) == 0
+                && !cafe2.descripcion().contains("Azucar")
+                && !cafe2.descripcion().contains("Crema")) {
+            System.out.println("APROBADO");
+        } else {
+            System.out.println("FALLIDO");
+        }
 
-        // CA05: Ensalada con Tomate y Pollo
+        // CA05: Ensalada con tomate y pollo
         System.out.println("\n===== CA05 =====");
 
-        Pedido ensalada = controlador.crearPedido("ensalada", "E001");
+        Pedido ensalada = servicio.crearPedido("ensalada", "E001");
 
         if (ensalada != null) {
             ensalada = servicio.agregarTomate(ensalada);
@@ -123,17 +92,22 @@ public class pruebasAceptacion {
 
             System.out.println(ensalada.descripcion());
             System.out.println("Total: $" + ensalada.precio());
+
+            if (ensalada.precio().compareTo(new BigDecimal("5.60")) == 0
+                    && ensalada.descripcion().contains("Tomate")
+                    && ensalada.descripcion().contains("Pollo")) {
+                System.out.println("APROBADO");
+            } else {
+                System.out.println("FALLIDO");
+            }
+        } else {
+            System.out.println("FALLIDO");
         }
 
-        verificar("CA05",
-                contiene(ensalada, "tomate")
-                && contiene(ensalada, "pollo")
-                && precioEs(ensalada, "5.60"));
-
-        // CA06: Pizza con Queso y Pepperoni
+        // CA06: Pizza con queso y pepperoni
         System.out.println("\n===== CA06 =====");
 
-        Pedido pizza = controlador.crearPedido("pizza", "P001");
+        Pedido pizza = servicio.crearPedido("pizza", "P001");
 
         if (pizza != null) {
             pizza = servicio.agregarQueso(pizza);
@@ -141,128 +115,125 @@ public class pruebasAceptacion {
 
             System.out.println(pizza.descripcion());
             System.out.println("Total: $" + pizza.precio());
+
+            if (pizza.precio().compareTo(new BigDecimal("7.10")) == 0
+                    && pizza.descripcion().contains("Queso")
+                    && pizza.descripcion().contains("Pepperoni")) {
+                System.out.println("APROBADO");
+            } else {
+                System.out.println("FALLIDO");
+            }
+        } else {
+            System.out.println("FALLIDO");
         }
 
-        verificar("CA06",
-                contiene(pizza, "queso")
-                && contiene(pizza, "pepperoni")
-                && precioEs(pizza, "7.10"));
-
-        // CA07: Rechazar Queso en Cafe
+        // CA07: No permitir queso en cafe
         System.out.println("\n===== CA07 =====");
 
-        Pedido cafeValidacion =
-                controlador.crearPedido("cafe", "C003");
+        Pedido cafe3 = servicio.crearPedido("cafe", "C003");
 
-        boolean rechazado = false;
-
-        if (cafeValidacion != null) {
-            String descripcionAntes = cafeValidacion.descripcion();
-            BigDecimal precioAntes = cafeValidacion.precio();
+        if (cafe3 != null) {
+            BigDecimal precioAntes = cafe3.precio();
+            String descripcionAntes = cafe3.descripcion();
+            boolean rechazado = false;
 
             try {
-                Pedido resultado = controlador.agregarIngrediente(
-                        cafeValidacion, "queso");
-
-                rechazado =
-                        resultado.descripcion().equals(descripcionAntes)
-                        && resultado.precio().compareTo(precioAntes) == 0;
-
-                System.out.println("Resultado: "
-                        + resultado.descripcion());
-
-            } catch (IllegalArgumentException ex) {
+                cafe3 = servicio.agregarQueso(cafe3);
+            } catch (IllegalArgumentException e) {
                 rechazado = true;
-                System.out.println("Operacion rechazada: "
-                        + ex.getMessage());
+                System.out.println("Mensaje: " + e.getMessage());
             }
+
+            if (rechazado
+                    && cafe3.precio().compareTo(precioAntes) == 0
+                    && cafe3.descripcion().equals(descripcionAntes)) {
+                System.out.println("APROBADO");
+            } else {
+                System.out.println("FALLIDO");
+            }
+        } else {
+            System.out.println("FALLIDO");
         }
 
-        verificar("CA07", rechazado);
-
-        // CA08: Ingrediente sin pedido seleccionado
+        // CA08: Agregar ingrediente sin pedido
         System.out.println("\n===== CA08 =====");
 
-        boolean sinPedidoRechazado = false;
+        boolean advertencia = false;
 
         try {
-            controlador.agregarIngrediente(null, "queso");
-            System.out.println("No se mostro advertencia");
-        } catch (IllegalArgumentException ex) {
-            sinPedidoRechazado = true;
-            System.out.println("Advertencia: " + ex.getMessage());
+            servicio.agregarAzucar(null);
+        } catch (IllegalArgumentException e) {
+            advertencia = true;
+            System.out.println("Mensaje: " + e.getMessage());
         }
 
-        verificar("CA08", sinPedidoRechazado);
+        if (advertencia) {
+            System.out.println("APROBADO");
+        } else {
+            System.out.println("FALLIDO");
+        }
 
-        // CA09: Clave inexistente
+        // CA09: Clonar producto inexistente
         System.out.println("\n===== CA09 =====");
 
-        ProductoBase inexistente =
-                registro.crearCopia("producto-inexistente", "X001");
+        Pedido inexistente =
+                servicio.crearPedido("no-existe", "X001");
 
-        System.out.println("Resultado: " + inexistente);
+        if (inexistente == null) {
+            System.out.println("APROBADO");
+        } else {
+            System.out.println("FALLIDO");
+        }
 
-        verificar("CA09", inexistente == null);
-
-        // CA10: Azucar dos veces en Cafe
+        // CA10: Agregar azucar dos veces
         System.out.println("\n===== CA10 =====");
 
-        Pedido cafeDobleAzucar =
-                controlador.crearPedido("cafe", "C004");
+        Pedido cafe4 = servicio.crearPedido("cafe", "C004");
 
-        if (cafeDobleAzucar != null) {
-            cafeDobleAzucar =
-                    servicio.agregarAzucar(cafeDobleAzucar);
+        if (cafe4 != null) {
+            cafe4 = servicio.agregarAzucar(cafe4);
+            cafe4 = servicio.agregarAzucar(cafe4);
 
-            cafeDobleAzucar =
-                    servicio.agregarAzucar(cafeDobleAzucar);
+            System.out.println(cafe4.descripcion());
+            System.out.println("Total: $" + cafe4.precio());
 
-            System.out.println(cafeDobleAzucar.descripcion());
-            System.out.println("Total: $" + cafeDobleAzucar.precio());
+            if (cafe4.precio().compareTo(new BigDecimal("3.20")) == 0
+                    && cafe4.descripcion().contains("Azucar + Azucar")) {
+                System.out.println("APROBADO");
+            } else {
+                System.out.println("FALLIDO");
+            }
+        } else {
+            System.out.println("FALLIDO");
         }
 
-        verificar("CA10",
-                precioEs(cafeDobleAzucar, "3.20")
-                && cafeDobleAzucar != null
-                && (cafeDobleAzucar.descripcion()
-                    .toLowerCase().split("azucar", -1).length - 1
-                    + cafeDobleAzucar.descripcion()
-                    .toLowerCase().split("azúcar", -1).length - 1) >= 2);
-
-        // CA11: Reiniciar y volver a clonar Cafe
+        // CA11: Reiniciar y crear otro cafe
         System.out.println("\n===== CA11 =====");
 
-        Pedido pedidoAnterior =
-                controlador.crearPedido("cafe", "C005");
+        Pedido anterior = servicio.crearPedido("cafe", "C005");
 
-        if (pedidoAnterior != null) {
-            pedidoAnterior =
-                    servicio.agregarAzucar(pedidoAnterior);
+        if (anterior != null) {
+            anterior = servicio.agregarAzucar(anterior);
         }
 
-        // Simular reinicio de la seleccion
-        pedidoAnterior = null;
+        // Simulamos que se limpia el pedido seleccionado
+        anterior = null;
 
-        Pedido nuevoCafe =
-                controlador.crearPedido("cafe", "C006");
+        Pedido nuevo = servicio.crearPedido("cafe", "C006");
 
-        if (nuevoCafe != null) {
-            System.out.println(nuevoCafe.descripcion());
-            System.out.println("Total: $" + nuevoCafe.precio());
+        if (nuevo != null) {
+            System.out.println(nuevo.descripcion());
+            System.out.println("Total: $" + nuevo.precio());
         }
 
-        verificar("CA11",
-                precioEs(nuevoCafe, "2.20")
-                && !contiene(nuevoCafe, "azucar")
-                && !contiene(nuevoCafe, "azúcar")
-                && !contiene(nuevoCafe, "crema"));
-
-        // RESUMEN
-        System.out.println("\n===== RESUMEN DE PRUEBAS =====");
-        System.out.println("Aprobadas: " + aprobados);
-        System.out.println("Fallidas: " + fallidos);
-        System.out.println("Total: " + (aprobados + fallidos));
+        if (nuevo != null
+                && nuevo.precio().compareTo(new BigDecimal("2.20")) == 0
+                && !nuevo.descripcion().contains("Azucar")
+                && !nuevo.descripcion().contains("Crema")) {
+            System.out.println("APROBADO");
+        } else {
+            System.out.println("FALLIDO");
+        }
     }
-    
+
 }
